@@ -1,0 +1,12 @@
+# tells git not to track these files
+
+# installed dependencies
+node_modules 
+# build output
+dist/        
+# secrets/config
+.env         
+# test coverage output
+coverage/    
+
+

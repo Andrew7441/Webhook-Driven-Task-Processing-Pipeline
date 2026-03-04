@@ -1,0 +1,9 @@
+# helps editors/IDEs keep consistent formatting
+root = true
+
+[*]
+end_of_line = lf            # linux style line endings
+insert_final_newline = true # newline at end of file
+charset = utf-8           
+indent_style = space
+indent_size = 2
