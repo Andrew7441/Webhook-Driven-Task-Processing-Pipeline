@@ -1,5 +1,6 @@
 import express from "express";
 import { PipeLineRouter } from "./routes/pipelines";
+import { hooksRouter } from "./routes/hooks"; 
 
 
 const app = express(); // create http server
@@ -12,6 +13,9 @@ app.get("/health", (req, res) => {
 
 // pipelines CRUD endpoints
 app.use("/pipelines", PipeLineRouter);
+
+// mount webhook endpoints under /hooks
+app.use("/hooks", hooksRouter); 
 
 const PORT = 8080;
 
