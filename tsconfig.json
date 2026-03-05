@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
