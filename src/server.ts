@@ -1,6 +1,7 @@
 import express from "express";
 import { PipeLineRouter } from "./routes/pipelines";
 import { hooksRouter } from "./routes/hooks"; 
+import { SubscriberRouter } from "./routes/subscribers";
 
 
 const app = express(); // create http server
@@ -16,6 +17,11 @@ app.use("/pipelines", PipeLineRouter);
 
 // mount webhook endpoints under /hooks
 app.use("/hooks", hooksRouter); 
+
+app.use("/pipelines", SubscriberRouter);
+// mounts the router under /pipelines
+// meaning routes inside the router become:
+// POST or GET /pipelines/:pipelineId/subscribers
 
 const PORT = 8080;
 
