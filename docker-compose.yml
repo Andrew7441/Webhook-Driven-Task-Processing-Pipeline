@@ -11,5 +11,17 @@ services:
       - "5432:5432"                     #map container port -> host port
     volumes:
       - postgres_data:/var/lib/postgresql/data #persist database files 
+
+  api:                                  #Node.js API service
+    build: .                            #build container from Dockerfile in project root
+    container_name: webhook_pipeline_api #name of the running API container
+    restart: always                     #restart API if it crashes
+    depends_on:
+      - postgres                        #ensure postgres starts before API
+    ports:
+      - "8080:8080"                     #expose API to localhost:8080
+    env_file:
+      - .env                            #load environment variables from .env
+
 volumes:
-  postgres_data:                                 #named volume docker manages for persistent storage
+  postgres_data:                        #named volume docker manages for persistent storage
