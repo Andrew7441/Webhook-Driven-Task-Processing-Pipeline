@@ -35,3 +35,9 @@ CREATE TABLE job_deliveries(
     response_code INTEGER,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- worker output from processing action
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS result JSONB;
+
+-- error message if job processing fails
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS error TEXT;

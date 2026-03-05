@@ -23,5 +23,15 @@ services:
     env_file:
       - .env                            #load environment variables from .env
 
+  worker:
+    build: .
+    container_name: webhook_pipeline_worker
+    restart: always
+    env_file:
+      - .env
+    command: ["npm", "run", "worker"]   #run worker 
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:                        #named volume docker manages for persistent storage
