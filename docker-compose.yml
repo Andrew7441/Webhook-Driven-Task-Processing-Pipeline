@@ -1,0 +1,15 @@
+services:
+  postgres:                             #service name
+    image: postgres:16                  #official postgresql v16 image
+    container_name: webhook_pipeline_db #name of the running container
+    restart: always                     #automatically restart if container stops
+    environment:                        #env variables used by postgres
+      POSTGRES_USER: postgres           
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pipeline_db
+    ports:
+      - "5432:5432"                     #map container port -> host port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data #persist database files 
+volumes:
+  postgres_data:                                 #named volume docker manages for persistent storage
