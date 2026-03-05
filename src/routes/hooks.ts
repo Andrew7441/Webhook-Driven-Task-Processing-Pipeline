@@ -15,7 +15,8 @@ hooksRouter.post("/:sourceKey", async (req, res) =>{
             [sourceKey] // parameterized query prevents SQL injection
         );
 
-        if(pipelineResult.rowCount === 0) return res.status(404).send({error: "pipeline not found"}); // edge case
+        //edge case
+        if(pipelineResult.rowCount === 0) return res.status(404).send({error: "pipeline not found"}); 
 
         const pipelineId = pipelineResult.rows[0].id; // extract pipeline ID from query result
 

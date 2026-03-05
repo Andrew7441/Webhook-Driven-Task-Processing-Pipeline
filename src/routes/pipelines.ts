@@ -7,7 +7,8 @@ export const PipeLineRouter = Router();     // create a router instance for pipe
 // API POST /pipelines which creates a new pipeline
 PipeLineRouter.post("/", async (req, res) => {
     const { name, source_key, action_type } = req.body ?? {}; // extract pipeline fields from req body
-
+    
+    //edge case
     if(!name || !source_key || !action_type) return res.status(400).send({ // validate required fields exist
         error: "name, source_key, and action_type are required!",
     });
