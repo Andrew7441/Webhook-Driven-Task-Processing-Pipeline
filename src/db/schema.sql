@@ -37,7 +37,7 @@ CREATE TABLE job_deliveries(
 );
 
 -- worker output from processing action
-ALTER TABLE jobs ADD COLUMN IF NOT EXISTS result JSONB;
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS result JSONB; -- JSONB is a postgresql column type that stores JSON objects
 
 -- error message if job processing fails
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS error TEXT;
