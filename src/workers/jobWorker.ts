@@ -1,3 +1,4 @@
+import { response } from "express";
 import { pool } from "../db/connection";
 
 //how often worker checks for new jobs in ms
@@ -103,6 +104,65 @@ async function failJob(jobId: number, err: any){
     );
 }
 
+// function query that gets all subscribers for a pipeline
+async function getSubscribersForPipeline(pipelineId: number){
+    const result = await pool.query(
+        `
+        SELECT * FROM pipeline_subscribers
+        WHERE pipeline_id = $1
+        ORDER BY id ASC
+        `,
+        [pipelineId]
+    );
+
+    return result.rows;
+}
+
+async function deliverToSubscriber(jobId: number, targetUrl: string, result: any){
+    try{
+        //try and send processed result to subscriber endpoints
+        const response = await fetch(targetUrl, {
+            method: "POST", // send data to subscriber
+            headers:{ // tells the receiver the request body is json
+                "Content-Type": "application/json", // needed to parse req.body correctly as json
+            },
+            body: JSON.stringify({ // json payload
+                job_id: jobId, // which job produced this result
+                result,
+            }),
+        });
+
+        //record susccessful delivery attempt
+        await pool.query(
+            `
+            INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
+            VALUES ($1, $2, $3, $4, $5)
+            `,
+            [jobId, targetUrl, 1, response.ok ? "success" : "failed", response.status] // .ok and .status come from fetch
+        );
+    }catch(err){ // catch err if fetch throws
+        //record failed delivery attempt if request itself crashed
+        await pool.query(
+            `
+            INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
+            VALUES ($1, $2, $3, $4, $5)
+            `,
+            [jobId, targetUrl, 1, "failed", null]
+        );
+        throw err; //throw again so worker logs it 
+    }
+}
+//fetches all subscribers for a pipeline
+//sends the processed result to each one
+async function deliverJobResults(jobId: number, pipelineId: number, result: any){
+    const subscribers = await getSubscribersForPipeline(pipelineId); // returns array of rows
+
+    // loop through each subscriber and deliver result one by one
+    for(const subscriber of subscribers){
+        await deliverToSubscriber(jobId,subscriber.target_url, result);
+    }
+}
+
 // main loop
 async function workLoop(){
     while(true){
@@ -119,6 +179,9 @@ async function workLoop(){
 
             // if action succeeds, store result and mark job as completed
             await completeJob(job.id,result);
+            
+            // deliver processed result to all subscribers of this pipeline
+            deliverJobResults(job.id, job.pipeline_id, result);
 
             console.log(`Completed Job: ${job.id} (${job.action_type})`);
         } catch(err){

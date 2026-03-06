@@ -2,7 +2,9 @@ import express from "express";
 import { PipeLineRouter } from "./routes/pipelines";
 import { hooksRouter } from "./routes/hooks"; 
 import { SubscriberRouter } from "./routes/subscribers";
+import { testReceiverRouter } from "./routes/testReceiver";
 
+const PORT = 8080;
 
 const app = express(); // create http server
 app.use(express.json()); // parses json req bodies, needed for webhooks
@@ -23,7 +25,7 @@ app.use("/pipelines", SubscriberRouter);
 // meaning routes inside the router become:
 // POST or GET /pipelines/:pipelineId/subscribers
 
-const PORT = 8080;
+app.use("/test", testReceiverRouter); // mounts POST /test/receiver
 
 //starts the API server
 app.listen(PORT, () => {

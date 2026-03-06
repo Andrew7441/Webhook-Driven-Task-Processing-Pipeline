@@ -9,7 +9,7 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
     const pipelineId = Number(req.params.pipelineId); // Express extracts :pipelineId from the URL (route parameter)
     const { target_url } = req.body ?? {};            // subscriber destination URL from request body
 
-    // check edge cases
+    // edge cases
     if(!pipelineId || !target_url) return res.status(400).send({error: "PipelineId and targetUrl are both required!"});
 
     // insert subscriber record so this pipeline can deliver results to this URL
@@ -25,8 +25,8 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
     return res.status(201).send(result.rows[0]); // return the created subscriber
 });
 
-// GET /pipelines/:pipelineId/subscribers
-// returns all subscriber URLs registered
+// GET /pipelines/:pipelineId/subscribers route
+// returns all subscriber URLs registered for a pipeline
 SubscriberRouter.get("/:pipelineId/subscribers", async (req, res) => {
     const pipelineId = Number(req.params.pipelineId);
 
