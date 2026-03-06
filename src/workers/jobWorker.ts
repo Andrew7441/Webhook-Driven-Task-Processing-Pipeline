@@ -1,4 +1,3 @@
-import { response } from "express";
 import { pool } from "../db/connection";
 
 //how often worker checks for new jobs in ms
@@ -220,7 +219,7 @@ async function workLoop(){
         }
 
         try{
-            // run pipelines processing action on the stored webhook payload
+            // run action on payload 
             const result = runAction(job.action_type, job.payload);
 
             // if action succeeds, store result and mark job as completed

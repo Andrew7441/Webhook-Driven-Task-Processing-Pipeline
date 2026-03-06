@@ -1,6 +1,5 @@
 import { Router } from "express";           // defines route groups
 import { pool } from "../db/connection";    // connection pool 
-import { Result } from "pg";
 
 export const PipeLineRouter = Router();     // create a router instance for pipeline endpoints
 
