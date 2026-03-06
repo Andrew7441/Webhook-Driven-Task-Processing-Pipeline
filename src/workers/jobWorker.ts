@@ -4,11 +4,19 @@ import { pool } from "../db/connection";
 //how often worker checks for new jobs in ms
 const POLL_INTERVAL_MS = 500;
 
+//how many times to retry a failed delivery
+const MAX_DELIVERY_ATTEMPTS = 3;
+
+//retry delay
+const DELIVERY_RETRY_DELAY_MS = 1000;
+
 //claim 1 job safely (prevents 2 workers taking same job)
 async function claimNextJob(){
     //transaction: select + update must be atomic
-    const client = await pool.connect();
-    
+    const client = await pool.connect(); // run multiple transactions on the same connection. This ensures selecting and updating a job 
+                                         // happens atomically which means operations run as a single unit of work. 
+                                         // either ALL queries succeed and commit, or if something fails they are rolled back.
+                                        // this prevents partial updates and ensures only one worker can claim the job. 
     try{
         await client.query("BEGIN"); // start transaction and block, meaning everything after this runs as one atomic unit until commit or rollback
 
@@ -118,49 +126,87 @@ async function getSubscribersForPipeline(pipelineId: number){
     return result.rows;
 }
 
-async function deliverToSubscriber(jobId: number, targetUrl: string, result: any){
+// deliver processed result to one subscriber with retry logic
+// each attempt is recorded in job_deliveries
+async function deliverToSubscriber(jobId: number, targetUrl: string, result: any) {
+  for (let attempt = 1; attempt <= MAX_DELIVERY_ATTEMPTS; attempt++) {
     try{
-        //try and send processed result to subscriber endpoints
-        const response = await fetch(targetUrl, {
-            method: "POST", // send data to subscriber
-            headers:{ // tells the receiver the request body is json
-                "Content-Type": "application/json", // needed to parse req.body correctly as json
-            },
-            body: JSON.stringify({ // json payload
-                job_id: jobId, // which job produced this result
-                result,
-            }),
-        });
+      // send processed result to subscriber endpoint
+      const response = await fetch(targetUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          job_id: jobId, // which job produced result
+          result,        // processed worker output
+        }),
+      });
 
-        //record susccessful delivery attempt
-        await pool.query(
-            `
-            INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
-            VALUES ($1, $2, $3, $4, $5)
-            `,
-            [jobId, targetUrl, 1, response.ok ? "success" : "failed", response.status] // .ok and .status come from fetch
-        );
-    }catch(err){ // catch err if fetch throws
-        //record failed delivery attempt if request itself crashed
-        await pool.query(
-            `
-            INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
-            VALUES ($1, $2, $3, $4, $5)
-            `,
-            [jobId, targetUrl, 1, "failed", null]
-        );
-        throw err; //throw again so worker logs it 
+      // record this delivery attempt
+      await pool.query(
+        `
+        INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
+        VALUES ($1, $2, $3, $4, $5)
+        `,
+        [jobId, targetUrl, attempt, response.ok ? "success" : "failed", response.status]
+      );
+
+      // if subscriber returned HTTP success, stop retrying
+      if (response.ok){
+        console.log(`Delivered Job ${jobId} to ${targetUrl} on attempt ${attempt}`);
+        return;
     }
+    
+    // HTTP request reached subscriber, but subscriber returned failure status
+    console.error(`Delivery failed for Job ${jobId} to ${targetUrl} on attempt ${attempt} with status ${response.status}`);
+
+    }catch(err) {
+      // request itself failed before a valid HTTP response was returned
+      await pool.query(
+        `
+        INSERT INTO job_deliveries (job_id, subscriber_url, attempt, status, response_code)
+        VALUES ($1, $2, $3, $4, $5)
+        `,
+        [jobId, targetUrl, attempt, "failed", null]
+      );
+
+      console.error(`Delivery crashed for Job ${jobId} to ${targetUrl} on attempt ${attempt}:`, err);
+    }
+
+    // if this was not the last attempt, wait before retrying
+    if (attempt < MAX_DELIVERY_ATTEMPTS) {
+      // simple backoff: 1s, 2s, 3s...
+      await sleep(DELIVERY_RETRY_DELAY_MS * attempt);
+    }
+  }
+
+  // all attempts failed
+  console.error(`All delivery attempts failed for Job ${jobId} for ${targetUrl}`);
 }
+
 //fetches all subscribers for a pipeline
 //sends the processed result to each one
 async function deliverJobResults(jobId: number, pipelineId: number, result: any){
+
     const subscribers = await getSubscribersForPipeline(pipelineId); // returns array of rows
+
+    //edge case, if no subs exist skip delivery
+    if(subscribers.length === 0){
+        console.log(`No subscribers found for pipeline ${pipelineId}`);
+        return;
+    }
 
     // loop through each subscriber and deliver result one by one
     for(const subscriber of subscribers){
         await deliverToSubscriber(jobId,subscriber.target_url, result);
     }
+}
+
+//helper function that sleweps between retry attempts
+function sleep(ms: number){
+    return new Promise((resolve) => setTimeout(resolve,ms)); // function that creates a promise, gives resolve function
+                                                             // after ms , resolve runs and promise completes
 }
 
 // main loop
