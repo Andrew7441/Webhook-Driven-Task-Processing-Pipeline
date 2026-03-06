@@ -1,0 +1,52 @@
+# workflow name shown in the Actions tab
+name: ci
+
+# run this workflow when a pull request targets the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code # downloads your repository code into the GitHub runner
+        uses: actions/checkout@v4
+        
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+        # installs Node.js
+        # cache: npm speeds up dependency installation in CI
+
+      - name: Install dependencies  # installs exact dependencies from package-lock.json
+        run: npm ci
+
+      - name: Build project # compiles your TypeScript project and fails CI if build breaks
+        run: npm run build
+        
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4 # downloads your repository code into the GitHub runner
+
+      - name: Set up Node
+        uses: actions/setup-node@v4 # installs Node.js
+        with:
+          node-version: 22
+          cache: npm # cache: npm speeds up dependency installation in CI
+
+      - name: Install dependencies
+        run: npm ci # installs exact dependencies from package-lock.json
+
+      - name: Run lint
+        run: npm run lint -- --max-warnings=0
+        # runs linting and fails CI even on warnings
