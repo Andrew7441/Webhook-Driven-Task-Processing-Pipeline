@@ -21,17 +21,22 @@ services:
     ports:
       - "8080:8080"                     #expose API to localhost:8080
     env_file:
-      - .env.docker                            #load environment variables from .env
+      - .env.docker                            #load environment variables from .env.docker
 
   worker:
     build: .
     container_name: webhook_pipeline_worker
     restart: always
     env_file:
-      - .env
-    command: ["npm", "run", "worker"]   #run worker 
+      - .env.docker                     # uses env.docker because db host must be postgres
+    command: ["npm", "run", "worker"]   #run worker. It needs its own command because it must run npm run worker instead of the API server
     depends_on:
       - postgres
 
 volumes:
   postgres_data:                        #named volume docker manages for persistent storage
+
+
+#both api and worker should use env.docker because they run inside docker containers, not on my machine.
+#Inside Docker,containers communicate over the Docker network using service names as hostnames, so db_host should be postgres
+#because i defined it above. Basically Docker compose lets other containers reach that service by its name
