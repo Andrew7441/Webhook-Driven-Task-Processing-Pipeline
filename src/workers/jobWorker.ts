@@ -24,6 +24,7 @@ async function claimNextJob(){
             `
         ); 
 
+        // edge case
         if(jobRes.rowCount === 0){
             await client.query("COMMIT"); // do nothing
             return null;
@@ -64,7 +65,7 @@ function runAction(actionType: string, payload: any){
             return { repository: String(payload?.repository ?? "").toUpperCase()};
         
         case "echo":
-            // example: uppercase repo name
+            // example: return as is
             return { payload }
 
         default:
@@ -95,35 +96,36 @@ async function failJob(jobId: number, err: any){
         UPDATE jobs
         SET status = 'failed',
         processed_at = NOW(),
-        error: $2
+        error = $2
         WHERE id = $1
         `,
-        [jobId, err]
+        [jobId, String(err?.message ?? err)]
     );
 }
 
 // main loop
 async function workLoop(){
     while(true){
+        const job = await claimNextJob(); // claim Pending job
+
+        if(!job){
+            await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+            continue;
+        }
+
         try{
-            const job = await claimNextJob(); // claim 1 job
-
-            //edge case
-            if(!job){
-                await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS)); // no pending jobs so sleep 
-                continue;
-            }
-
-            //run action on payload
+            // run pipelines processing action on the stored webhook payload
             const result = runAction(job.action_type, job.payload);
 
-            // store result and mark complete
-            await completeJob(job.id, result);
+            // if action succeeds, store result and mark job as completed
+            await completeJob(job.id,result);
 
             console.log(`Completed Job: ${job.id} (${job.action_type})`);
-        }catch(err){
-            console.error("worker error:", err);
-            await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+        } catch(err){
+            // if action fails, mark this specific job as failed
+            await failJob(job.id, err);
+
+            console.log(`Failed Job: ${job.id} (${job.action_type})`);
         }
     }
 }
