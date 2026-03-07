@@ -7,12 +7,11 @@ on:
 jobs:
     docker: 
         name: Docker Build
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-latest # runs job on a temporary Ubuntu GitHub runner
 
         steps:
             - name: Check out code
-            uses: actions/checkout@v4 # downloads repo code into runner(GH temp virtual machine that executes my workflow)
+              uses: actions/checkout@v4 # downloads repo code into runner (GitHub VM)
 
             - name: Build Docker containers
-            run: docker compose build # verifies that the Dockerfile and docker-compose.yml build correctly
-
+              run: docker compose build # verifies Dockerfile and docker-compose.yml build correctly
