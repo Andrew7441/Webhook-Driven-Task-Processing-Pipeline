@@ -1,0 +1,18 @@
+name: cd
+
+on:
+    push:
+        branches: [main] # run CD when code is pushed to main
+
+jobs:
+    docker: 
+        name: Docker Build
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out code
+            uses: actions/checkout@v4 # downloads repo code into runner(GH temp virtual machine that executes my workflow)
+
+            - name: Build Docker containers
+            run: docker compose build # verifies that the Dockerfile and docker-compose.yml build correctly
+
