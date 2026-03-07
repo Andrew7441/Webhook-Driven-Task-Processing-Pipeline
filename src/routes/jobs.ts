@@ -5,7 +5,6 @@ export const JobsRouter = Router();
 
 //GET /Jobs
 //list recent jobs
-
 JobsRouter.get("/", async (req, res) => {
     const result = await pool.query(
         `
@@ -36,7 +35,7 @@ JobsRouter.get("/:JobId", async (req, res) => {
     );
 
     //edge case
-    if(result.rowCount === 0) res.status(400).send({ error: "Job not found"});
+    if(result.rowCount === 0) res.status(404).send({ error: "Job not found"});
 
     return res.send(result.rows[0]);
 });

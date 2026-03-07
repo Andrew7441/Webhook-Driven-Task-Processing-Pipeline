@@ -226,7 +226,7 @@ async function workLoop(){
             await completeJob(job.id,result);
             
             // deliver processed result to all subscribers of this pipeline
-            deliverJobResults(job.id, job.pipeline_id, result);
+            await deliverJobResults(job.id, job.pipeline_id, result);
 
             console.log(`Completed Job: ${job.id} (${job.action_type})`);
         } catch(err){
