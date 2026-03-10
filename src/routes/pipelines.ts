@@ -49,3 +49,88 @@ PipeLineRouter.get("/", async (req, res) => {
     //return array of pipelines
     return res.send(result.rows);
 });
+
+//GET /pipelines/:pipelineId
+//get a single pipeline by Id
+PipeLineRouter.get("/:pipelineId", async (req, res) => {
+    const pipelineId = Number(req.params.pipelineId);
+
+    if(!pipelineId) return res.status(400).send({error: "pipelineId is required"}); // 400 for bad request
+
+
+    const result = await pool.query(
+        `
+        SELECT * FROM pipelines
+        WHERE id = $1
+        `,
+        [pipelineId]
+    );
+
+    if(result.rowCount === 0) return res.status(404).send({error:  "Pipeline not found"}); // 404 for not found
+
+    return res.send(result.rows[0]);
+});
+
+//PUT /pipelines/:pipelineId
+// update a single pipeline by Id
+PipeLineRouter.put("/:pipelineId", async (req, res) =>{
+    const pipelineId = Number(req.params.pipelineId); // extract id from url
+    const { name, source_key, action_type } = req.body ?? {}; // fields to update
+
+    //edge case
+    if(!pipelineId) return res.status(400).send({ error: "pipelineId is required"});
+
+    //edge case 
+    if(!name && !source_key && !action_type) res.status(400).send({ error: "At least one field is required to update"});
+
+    try{
+        //update pipeline Fields and keep old values if a field was not provided
+
+        const result = await pool.query(
+            `
+            UPDATE pipelines
+            SET name = COALESCE($2, name),
+                source_key = COALESCE($3, source_key),
+                action_type = COALESCE($4, action_type)
+            WHERE id = $1
+            RETURNING *
+            `,
+            [pipelineId, name, source_key, action_type]
+        );
+
+        //edge case
+        if(result.rowCount === 0) return res.status(404).send({error : "pipeline not found"});
+
+        return res.send(result.rows[0]);
+
+    }catch(err: any){
+        if(err?.code === "23505") return res.status(409).send({error: "source_key already exists"});
+
+        return res.status(500).send({ error: "internal server error"});
+    }
+});
+
+//DELETE /pipelines/:pipelineId
+//delete a single pipeline by id
+PipeLineRouter.delete("/:pipelineId", async (req, res) => {
+    const pipelineId = Number(req.params.pipelineId);
+
+    //edge case
+    if(!pipelineId) return res.status(400).send({ error: "pipeline is required"});
+
+    const result = await pool.query(
+        `
+        DELETE FROM pipelines
+        WHERE id = $1
+        RETURNING * 
+        `,
+        [pipelineId]
+    );
+
+    if(result.rowCount === 0) return res.status(404).send({ error: "pipeline not found"});
+
+    return res.send({
+        message: "Pipeline deleted successfully",
+        pipeline: result.rows[0]
+    });
+});

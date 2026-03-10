@@ -5,7 +5,7 @@ result to registered subscriber URLs.
 
 ## Features
 
-- Create and manage pipelines
+- Full CRUD for pipelines (create, list, get, update, delete)
 - Receive webhooks through unique pipeline source URLs
 - Queue jobs for asynchronous background processing
 - Worker safely claims and processes pending jobs
@@ -36,7 +36,7 @@ The system is split into three main parts:
 1. API Service
 
 Responsible for:
-- pipeline creation and listing
+- pipeline CRUD operations
 - subscriber registration
 - webhook ingestion
 - job status / history endpoints
@@ -157,12 +157,33 @@ Example:
 ```
 ## Quick Start 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 This starts:
 - PostgreSQL
 - API service
 - Worker service
+
+## API Endpoints
+
+### Pipelines
+- POST /pipelines
+- GET /pipelines
+- GET /pipelines/:pipelineId
+- PUT /pipelines/:pipelineId
+- DELETE /pipelines/:pipelineId
+
+### Subscribers
+- POST /pipelines/:pipelineId/subscribers
+- GET /pipelines/:pipelineId/subscribers
+
+### Webhooks
+- POST /hooks/:sourceKey
+
+### Jobs
+- GET /jobs
+- GET /jobs/:jobId
+- GET /jobs/:jobId/deliveries
 
 ## Reliability notes
 
