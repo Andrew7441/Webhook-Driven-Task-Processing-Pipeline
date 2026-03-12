@@ -79,9 +79,9 @@ function runAction(actionType: string, payload: any){
         case "lowercase_repo":
             return { repository: String(payload?.repository) ?? "".toLowerCase()};
         
-
         case "count_payload_keys":
-            return {key_count: Object.keys(payload ?? {}).length};
+            return { key_count: Object.keys(payload ?? {}).length};
+        
         default:
             // unknown action should fail the job
             throw new Error(`Unknown action_type: ${actionType}`);
