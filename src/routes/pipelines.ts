@@ -3,7 +3,16 @@ import { pool } from "../db/connection";    // connection pool
 
 export const PipeLineRouter = Router();     // create a router instance for pipeline endpoints
 
-// API POST /pipelines which creates a new pipeline
+const ALLOWED_ACTION_TYPES = [
+    "extract_commits",
+    "uppercase_repo",
+    "echo",
+    "lowercase_repo",
+    "count_payload_keys",
+] as const;
+
+//API POST /pipelines 
+//creates a new pipeline
 PipeLineRouter.post("/", async (req, res) => {
     const { name, source_key, action_type } = req.body ?? {}; // extract pipeline fields from req body
     
@@ -11,6 +20,8 @@ PipeLineRouter.post("/", async (req, res) => {
     if(!name || !source_key || !action_type) return res.status(400).send({ // validate required fields exist
         error: "name, source_key, and action_type are required!",
     });
+
+    if(!ALLOWED_ACTION_TYPES.includes(action_type)) return res.status(400).send({error: "invalid action type"});
 
     try{
         // insert pipeline into db and return created record
@@ -82,6 +93,8 @@ PipeLineRouter.put("/:pipelineId", async (req, res) =>{
 
     //edge case 
     if(!name && !source_key && !action_type) res.status(400).send({ error: "At least one field is required to update"});
+
+    if(!ALLOWED_ACTION_TYPES.includes(action_type)) res.status(400).send({ error: "action type is invalid"});
 
     try{
         //update pipeline Fields and keep old values if a field was not provided

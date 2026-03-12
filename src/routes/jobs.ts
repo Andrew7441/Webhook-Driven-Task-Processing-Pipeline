@@ -35,7 +35,7 @@ JobsRouter.get("/:JobId", async (req, res) => {
     );
 
     //edge case
-    if(result.rowCount === 0) res.status(404).send({ error: "Job not found"});
+    if(result.rowCount === 0) return res.status(404).send({ error: "Job not found"});
 
     return res.send(result.rows[0]);
 });
