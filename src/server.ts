@@ -4,6 +4,7 @@ import { hooksRouter } from "./routes/hooks";
 import { SubscriberRouter } from "./routes/subscribers";
 import { testReceiverRouter } from "./routes/testReceiver";
 import { JobsRouter } from "./routes/jobs";
+import { metricsRouter } from "./routes/metrics";
 
 const PORT = 8080;
 
@@ -29,6 +30,8 @@ app.use("/pipelines", SubscriberRouter);
 app.use("/test", testReceiverRouter); // mounts POST /test/receiver
 
 app.use("/jobs", JobsRouter); // mount /jobs/, etc
+
+app.use("/metrics", metricsRouter); // mount metrics
 
 //starts the API server
 app.listen(PORT, () => {
