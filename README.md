@@ -9,15 +9,18 @@ result to registered subscriber URLs.
 - Receive webhooks through unique pipeline source URLs
 - Queue jobs for asynchronous background processing
 - Worker safely claims and processes pending jobs
-- Three processing action types:
+- Five processing action types:
     - extract_commits
     - uppercase_repo
     - echo
+    - lowercase_repo
+    - count_payload_keys
 - Register subscribers per pipeline
 - Deliver processed results to subscribers 
 - Retry failed deliveries with a simple backoff
 - Track delivery attempts in the database
 - Query job status, result, error, and delivery history
+- System metrics endpoint 
 - Run the full system with Docker Compose
 - GitHub Actions CI/CD for linting, build, and Docker verification
 
@@ -40,6 +43,7 @@ Responsible for:
 - subscriber registration
 - webhook ingestion
 - job status / history endpoints
+- system metrics endpoint
 
 2. PostgreSQL
 
@@ -185,6 +189,9 @@ This starts:
 - GET /jobs/:jobId
 - GET /jobs/:jobId/deliveries
 
+### Metrics
+- GET /metrics
+
 ## Reliability notes
 
 - Jobs are processed asynchronously so webhook requests return quickly without waiting for processing to finish.
@@ -194,6 +201,8 @@ This starts:
 - Failed subscriber deliveries are retried with simple backoff, and each attempt is recorded in job_deliveries.
 
 - Job processing failures are stored in the jobs table, while delivery failures are tracked separately in job_deliveries.
+
+- A metrics endpoint exposes system counts (pipelines, jobs, deliveries) for basic monitoring.
 
 ## Continuous Integration
 
@@ -210,3 +219,5 @@ This starts:
 - Delivery attempts are stored in a separate table to make retry tracking and debugging clearer.
 
 - Processing actions are kept simple and separated by 'action_type' so the system is easy to extend later.
+
+- Pipeline `action_type` values are validated against a fixed set of supported actions to prevent invalid pipeline configurations and make worker  behavior more predictable.
