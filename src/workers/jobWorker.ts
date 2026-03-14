@@ -77,7 +77,7 @@ function runAction(actionType: string, payload: any){
             return { payload }
 
         case "lowercase_repo":
-            return { repository: String(payload?.repository) ?? "".toLowerCase()};
+            return { repository: String(payload?.repository ?? "").toLowerCase()};
         
         case "count_payload_keys":
             return { key_count: Object.keys(payload ?? {}).length};
