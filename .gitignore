@@ -5,7 +5,8 @@ node_modules
 # build output
 dist/        
 # secrets/config
-.env         
+.env 
+.env.docker        
 # test coverage output
 coverage/    
 
