@@ -149,6 +149,16 @@ Example:
 }
 ```
 
+### lowercase_repo
+lowercases the repository name
+
+Example:
+```json
+{
+  "repository": "demo-repo"
+}
+```
+
 ### echo 
 Returns the payload unchanged
 Example:
@@ -159,6 +169,17 @@ Example:
   }
 }
 ```
+
+### count_payload_keys
+Counts how many top level keys exist in the webhook payload
+
+Example:
+```json
+{
+  "key_count": 3
+}
+```
+
 ## Quick Start 
 ```bash
 docker compose up -d --build

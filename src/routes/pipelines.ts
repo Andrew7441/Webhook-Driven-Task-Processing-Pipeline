@@ -92,9 +92,9 @@ PipeLineRouter.put("/:pipelineId", async (req, res) =>{
     if(!pipelineId) return res.status(400).send({ error: "pipelineId is required"});
 
     //edge case 
-    if(!name && !source_key && !action_type) res.status(400).send({ error: "At least one field is required to update"});
+    if(!name && !source_key && !action_type) return res.status(400).send({ error: "At least one field is required to update"});
 
-    if(!ALLOWED_ACTION_TYPES.includes(action_type)) res.status(400).send({ error: "action type is invalid"});
+    if(action_type && !ALLOWED_ACTION_TYPES.includes(action_type)) res.status(400).send({ error: "action type is invalid"});
 
     try{
         //update pipeline Fields and keep old values if a field was not provided
@@ -129,7 +129,7 @@ PipeLineRouter.delete("/:pipelineId", async (req, res) => {
     const pipelineId = Number(req.params.pipelineId);
 
     //edge case
-    if(!pipelineId) return res.status(400).send({ error: "pipeline is required"});
+    if(!pipelineId) return res.status(400).send({ error: "pipelineId is required"});
 
     const result = await pool.query(
         `

@@ -30,6 +30,7 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
 SubscriberRouter.get("/:pipelineId/subscribers", async (req, res) => {
     const pipelineId = Number(req.params.pipelineId);
 
+    //edge case
     if(!pipelineId) return res.status(400).send({error: "pipelineId is required"});
 
     const result = await pool.query(

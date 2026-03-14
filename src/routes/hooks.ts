@@ -35,7 +35,7 @@ hooksRouter.post("/:sourceKey", async (req, res) =>{
             job: jobResult.rows[0],     // return job metadata
         });
 
-    } catch(err){
+    }catch(err){
         console.error(err);     // log server/db errors for debugging
         return res.status(500).send({ error: "internal server error"}); // generic error res
     }

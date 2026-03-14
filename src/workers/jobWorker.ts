@@ -161,7 +161,7 @@ async function deliverToSubscriber(jobId: number, targetUrl: string, result: any
       if (response.ok){
         console.log(`Delivered Job ${jobId} to ${targetUrl} on attempt ${attempt}`);
         return;
-    }
+      }
     
     // HTTP request reached subscriber, but subscriber returned failure status
     console.error(`Delivery failed for Job ${jobId} to ${targetUrl} on attempt ${attempt} with status ${response.status}`);
@@ -184,7 +184,7 @@ async function deliverToSubscriber(jobId: number, targetUrl: string, result: any
       // simple backoff: 1s, 2s, 3s...
       await sleep(DELIVERY_RETRY_DELAY_MS * attempt);
     }
-  }
+}
 
   // all attempts failed
   console.error(`All delivery attempts failed for Job ${jobId} for ${targetUrl}`);
