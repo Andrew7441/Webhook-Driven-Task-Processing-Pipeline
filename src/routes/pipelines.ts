@@ -94,7 +94,7 @@ PipeLineRouter.put("/:pipelineId", async (req, res) =>{
     //edge case 
     if(!name && !source_key && !action_type) return res.status(400).send({ error: "At least one field is required to update"});
 
-    if(action_type && !ALLOWED_ACTION_TYPES.includes(action_type)) res.status(400).send({ error: "action type is invalid"});
+    if(action_type && !ALLOWED_ACTION_TYPES.includes(action_type)) return res.status(400).send({ error: "action type is invalid"});
 
     try{
         //update pipeline Fields and keep old values if a field was not provided
