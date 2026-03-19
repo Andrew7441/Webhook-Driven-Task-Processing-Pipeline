@@ -56,8 +56,8 @@ PipeLineRouter.get("/", async (req, res) => {
         ORDER BY id DESC
         `
     );
-
-    //return array of pipelines
+    
+    // return array of pipelines even if empty
     return res.send(result.rows);
 });
 
@@ -66,6 +66,7 @@ PipeLineRouter.get("/", async (req, res) => {
 PipeLineRouter.get("/:pipelineId", async (req, res) => {
     const pipelineId = Number(req.params.pipelineId);
 
+    //edge case
     if(!pipelineId) return res.status(400).send({error: "pipelineId is required"}); // 400 for bad request
 
 
