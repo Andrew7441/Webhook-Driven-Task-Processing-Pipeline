@@ -33,6 +33,20 @@ services:
     depends_on:
       - postgres
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile  # keep exact name if lowercase
+    container_name: webhook_pipeline_frontend
+    restart: always
+    ports:
+      - "5173:5173"          # map host:container 5173
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    depends_on:
+      - api
 volumes:
   postgres_data:                        #named volume docker manages for persistent storage
 

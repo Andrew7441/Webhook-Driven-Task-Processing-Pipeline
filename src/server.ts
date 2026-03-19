@@ -24,7 +24,7 @@ app.get("/server", async (req, res) =>{
     if(result.rowCount === 1) return res.send({ Status: "Ok", DataBase: "Ready"});
 
     throw new Error("DB query failed");
-  }catch(err){
+  }catch{
     return res.status(503).send({ status: "error", db: "disconnected" });
   }
 })
