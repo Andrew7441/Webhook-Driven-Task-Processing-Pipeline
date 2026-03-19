@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "worker": "ts-node-dev --respawn --transpile-only src/workers/jobWorker.ts",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:frontend": "npm --prefix frontend run lint -- --max-warnings=0"
   },
   "keywords": [],
   "author": "",

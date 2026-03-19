@@ -1,7 +1,8 @@
 # Webhook-Driven Task Processing Pipeline
 
 A TypeScript backend service that receives webhooks, queues them as jobs, processes them in the background, and delivers the processed
-result to registered subscriber URLs.
+result to registered subscriber URLs. It also includes a lightweight dashboard UI for monitoring pipelines, jobs, and 
+system metrics in real time.
 
 ## Features
 
@@ -21,11 +22,15 @@ result to registered subscriber URLs.
 - Track delivery attempts in the database
 - Query job status, result, error, and delivery history
 - System metrics endpoint 
+- Dashboard UI for viewing pipelines, jobs, and metrics in real time
 - Run the full system with Docker Compose
-- GitHub Actions CI/CD for linting, build, and Docker verification
+- GitHub Actions CI for linting, build, and Docker verification
 
 ## Technology Stack
 
+- React
+- Vite
+- Tailwind CSS
 - TypeScript
 - Express
 - PostgreSQL
@@ -34,7 +39,7 @@ result to registered subscriber URLs.
 
 ## Architecture
 
-The system is split into three main parts:
+The system is split into four main parts:
 
 1. API Service
 
@@ -55,13 +60,21 @@ Stores:
 
 3. Worker
 
-Responsible For:
+Responsible for:
 - polling for pending jobs
 - safely claiming jobs using database locking
 - processing payloads based on 'action_type'
 - updating job status/results
 - delivering processed results to subscribers
 - retrying failed deliveries
+
+4. Dashboard UI
+
+Responsible for:
+- displaying pipelines
+- displaying recent jobs and statuses
+- displaying system metrics
+- providing a simple monitoring view for demos and debugging
 
 ### High-Level Flow
 ```text
@@ -150,7 +163,7 @@ Example:
 ```
 
 ### lowercase_repo
-lowercases the repository name
+Lowercases the repository name
 
 Example:
 ```json
@@ -188,6 +201,10 @@ This starts:
 - PostgreSQL
 - API service
 - Worker service
+- Frontend dashboard
+
+- Dashboard: http://localhost:5173
+- API: http://localhost:8080
 
 ## API Endpoints
 

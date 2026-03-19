@@ -3,17 +3,20 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig(
+export default defineConfig([
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-    plugins: { js },
-    extends: ["js/recommended"],
-    languageOptions: { globals: globals.node },
+    files: ["**/*.{js,ts,tsx}"],
+    languageOptions: {
+      globals: globals.node,
+    },
   },
-  tseslint.configs.recommended,
+
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "off", // webhook payloads are dynamic JSON
+      "@typescript-eslint/no-explicit-any": "off",
     },
-  }
-);
+  },
+]);

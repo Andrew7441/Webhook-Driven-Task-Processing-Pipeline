@@ -70,8 +70,10 @@ export default function App() {
       setPipelines(p);
       setJobs(j);
       setMetrics(m);
-    } catch (err: any) {
-      setError(err?.message ?? "Unknown error");
+    } catch (err: unknown) {
+      if(err instanceof Error){
+        setError(err.message);
+      }
     } finally {
       setIsLoading(false);
     }
