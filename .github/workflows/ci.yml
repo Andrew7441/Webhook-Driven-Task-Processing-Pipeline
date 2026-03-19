@@ -1,7 +1,7 @@
 # workflow name shown in the Actions tab
 name: ci
 
-# run this workflow when a pull request targets the main branch
+# run this workflow when code is pushed to the main branch
 on:
   push:
     branches: [main]
@@ -14,21 +14,29 @@ jobs:
     steps:
       - name: Check out code # downloads your repository code into the GitHub runner
         uses: actions/checkout@v4
-        
 
       - name: Set up Node
-        uses: actions/setup-node@v4  # installs Node.js
+        uses: actions/setup-node@v4 # installs Node.js
         with:
-          node-version: 22 
-          cache: npm # cache: npm speeds up dependency installation in CI    
+          node-version: 22
+          cache: npm # cache: npm speeds up dependency installation in CI
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json # cache both root and frontend dependencies
 
-      - name: Install dependencies  # installs exact dependencies from package-lock.json
+      - name: Install root dependencies # installs exact root dependencies from package-lock.json
         run: npm ci
 
-      - name: Build project # compiles your TypeScript project and fails CI if build breaks
+      - name: Build backend/root project # compiles backend TypeScript
         run: npm run build
-        
-  lint: # checks code style and quality using linter. 
+
+      - name: Install frontend dependencies # installs exact frontend dependencies from frontend/package-lock.json
+        run: npm --prefix frontend ci
+
+      - name: Build frontend project # builds the frontend so CI verifies both backend and dashboard
+        run: npm --prefix frontend run build
+
+  lint: # checks code style and quality using linter.
     name: Lint
     runs-on: ubuntu-latest
 
@@ -41,9 +49,18 @@ jobs:
         with:
           node-version: 22
           cache: npm # cache: npm speeds up dependency installation in CI
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json # cache both root and frontend dependencies
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci # installs exact dependencies from package-lock.json
 
-      - name: Run lint
-        run: npm run lint -- --max-warnings=0 # runs linting and fails CI even on warnings
+      - name: Lint backend/root
+        run: npm run lint -- --max-warnings=0 --ignore-pattern frontend # runs root lint only and skips frontend
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci # installs exact frontend dependencies from frontend/package-lock.json
+
+      - name: Lint frontend
+        run: npm run lint:frontend # runs frontend lint with frontend dependencies installed
