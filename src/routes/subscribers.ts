@@ -3,6 +3,7 @@ import { pool } from "../db/connection";
 
 export const SubscriberRouter = Router(); // create router instance dedicated to subscriber endpoints
 
+
 //POST /pipelines/:pipelineId/subscribers 
 //adds a subscriber URL to a pipeline
 SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
@@ -11,6 +12,18 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
 
     // edge cases
     if(!pipelineId || !target_url) return res.status(400).send({error: "PipelineId and targetUrl are both required!"});
+
+    const pipelineResult = await pool.query(
+        `
+        SELECT id FROM pipelines
+        WHERE id = $1
+        `,
+        [pipelineId]
+    );
+
+    if(pipelineResult.rowCount === 0){
+        return res.status(404).send({ error: "No pipeline found"});
+    }
 
     // insert subscriber record so this pipeline can deliver results to this URL
     const result = await pool.query(

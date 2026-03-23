@@ -45,7 +45,6 @@ PipeLineRouter.post("/", async (req, res) => {
     }
 });
 
-
 //API GET /pipelines which lists all pipelines
 PipeLineRouter.get("/", async (req, res) => {
 
@@ -68,7 +67,6 @@ PipeLineRouter.get("/:pipelineId", async (req, res) => {
 
     //edge case
     if(!pipelineId) return res.status(400).send({error: "pipelineId is required"}); // 400 for bad request
-
 
     const result = await pool.query(
         `
@@ -95,6 +93,7 @@ PipeLineRouter.put("/:pipelineId", async (req, res) =>{
     //edge case 
     if(!name && !source_key && !action_type) return res.status(400).send({ error: "At least one field is required to update"});
 
+    //edge case
     if(action_type && !ALLOWED_ACTION_TYPES.includes(action_type)) return res.status(400).send({ error: "action type is invalid"});
 
     try{
