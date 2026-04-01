@@ -181,8 +181,8 @@ async function deliverToSubscriber(jobId: number, targetUrl: string, result: any
 
     // if this was not the last attempt, wait before retrying
     if (attempt < MAX_DELIVERY_ATTEMPTS) {
-      // simple backoff: 1s, 2s, 3s...
-      await sleep(DELIVERY_RETRY_DELAY_MS * attempt);
+        const delay = DELIVERY_RETRY_DELAY_MS * 1000; // linear backoff
+        await sleep(delay);
     }
 }
 

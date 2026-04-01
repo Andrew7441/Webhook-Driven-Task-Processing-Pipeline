@@ -3,7 +3,7 @@ import { pool } from "../db/connection";
 
 export const hooksRouter = Router();  // router instance for webhook endpoints
 
-// POST /hooks/:sourceKey -> webhook ingestion endpoint
+// POST /hooks/:sourceKey webhook ingestion endpoint
 hooksRouter.post("/:sourceKey", async (req, res) =>{
     const { sourceKey } = req.params;   // extract sourceKey from URL parameter
     const payload = req.body;           // webhook request body (event data)
@@ -40,4 +40,3 @@ hooksRouter.post("/:sourceKey", async (req, res) =>{
         return res.status(500).send({ error: "internal server error"}); // generic error res
     }
 });
-

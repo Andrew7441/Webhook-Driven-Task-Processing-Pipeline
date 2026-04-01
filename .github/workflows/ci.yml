@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4 # installs Node.js
+        uses: actions/setup-node@v4 # install Node.js
         with:
           node-version: 22
           cache: npm # cache: npm speeds up dependency installation in CI
@@ -24,13 +24,13 @@ jobs:
             package-lock.json
             frontend/package-lock.json # cache both root and frontend dependencies
 
-      - name: Install root dependencies # installs exact root dependencies from package-lock.json
+      - name: Install root dependencies # installs root dependencies from package-lock.json
         run: npm ci
 
       - name: Build backend/root project # compiles backend TypeScript
         run: npm run build
 
-      - name: Install frontend dependencies # installs exact frontend dependencies from frontend/package-lock.json
+      - name: Install frontend dependencies # installs frontend dependencies from frontend/package-lock.json
         run: npm --prefix frontend ci
 
       - name: Build frontend project # builds the frontend so CI verifies both backend and dashboard
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4 # downloads your repository code into the GitHub runner
+        uses: actions/checkout@v4 # downloads repository code into the GitHub runner
 
       - name: Set up Node
         uses: actions/setup-node@v4 # installs Node.js
