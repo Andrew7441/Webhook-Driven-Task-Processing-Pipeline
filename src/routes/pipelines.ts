@@ -76,6 +76,7 @@ PipeLineRouter.get("/:pipelineId", async (req, res) => {
         [pipelineId]
     );
 
+    //edge case 
     if(result.rowCount === 0) return res.status(404).send({error:  "Pipeline not found"}); // 404 for not found
 
     return res.send(result.rows[0]);
