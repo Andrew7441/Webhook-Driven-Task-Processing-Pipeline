@@ -81,6 +81,9 @@ function runAction(actionType: string, payload: any){
         
         case "count_payload_keys":
             return { key_count: Object.keys(payload ?? {}).length};
+
+        case "count_commits":
+            return { count_commit: Array.isArray(payload?.commits) ? payload.commits.length : 0 };
         
         default:
             // unknown action should fail the job
@@ -181,7 +184,7 @@ async function deliverToSubscriber(jobId: number, targetUrl: string, result: any
 
     // if this was not the last attempt, wait before retrying
     if (attempt < MAX_DELIVERY_ATTEMPTS) {
-        const delay = DELIVERY_RETRY_DELAY_MS * 1000; // linear backoff
+        const delay = DELIVERY_RETRY_DELAY_MS * attempt; // linear backoff
         await sleep(delay);
     }
 }

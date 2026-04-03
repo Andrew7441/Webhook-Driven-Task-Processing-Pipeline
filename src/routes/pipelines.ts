@@ -9,6 +9,7 @@ const ALLOWED_ACTION_TYPES = [
     "echo",
     "lowercase_repo",
     "count_payload_keys",
+    "count_commits",
 ] as const;
 
 //API POST /pipelines 
