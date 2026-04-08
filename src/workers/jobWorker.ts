@@ -201,7 +201,7 @@ async function deliverJobResults(jobId: number, pipelineId: number, result: any)
 
     //edge case, if no subs exist skip delivery
     if(subscribers.length === 0){
-        console.log(`No subscribers found for pipeline ${pipelineId}`);
+        console.error(`No subscribers found for pipeline ${pipelineId}`);
         return;
     }
 

@@ -1,14 +1,19 @@
+#start from a node 22 image, sets working directory, copies package.json file, installs dependencies, copies code, exposes port and starts the app
+#image version
 FROM node:22
 
-#creates the app
+#creates the app and gives the container a clean working directory for the project files & commands
 WORKDIR /app 
-
-COPY package*.json ./
-#install dependencies
-RUN npm install
+#docker can cache dep. installation seperately from the source code coopy. Makes rebuild faster
+COPY package*.json ./ 
+#install dependencies needed by container at runtime
+RUN npm install 
 #copies project files
 COPY . .
 #port
 EXPOSE 8080
-#default command
+#default command to run dev server inside container for local dev and testing
 CMD ["npm", "run", "dev"]
+
+#improvement ideas:
+    #use npm ci instead of npm install for faster/cleaner automated builds bcz it gives deterministic installs based on the lockfile

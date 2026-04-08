@@ -8,6 +8,9 @@ hooksRouter.post("/:sourceKey", async (req, res) =>{
     const { sourceKey } = req.params;   // extract sourceKey from URL parameter
     const payload = req.body;           // webhook request body (event data)
 
+    //edge case
+    if(!payload || !sourceKey) return res.status(404).send({error: "Payload and sourceKey are required!"});
+
     try{
         //query database to find pipeline with this source_key
         const pipelineResult = await pool.query(

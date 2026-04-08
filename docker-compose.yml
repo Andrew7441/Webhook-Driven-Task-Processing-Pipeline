@@ -1,4 +1,4 @@
-services:
+services: # split multiple services bcz each service has a clear responsibility. makes the sys easier to build,debug,explain
   postgres:                             #service name
     image: postgres:16                  #official postgresql v16 image
     container_name: webhook_pipeline_db #name of the running container
@@ -21,7 +21,7 @@ services:
     ports:
       - "8080:8080"                     #expose API to localhost:8080
     env_file:
-      - .env.docker                            #load environment variables from .env.docker
+      - .env.docker                     #load environment variables from .env.docker
 
   worker:
     build: .
@@ -38,12 +38,12 @@ services:
       context: ./frontend
       dockerfile: dockerfile  # keep exact name if lowercase
     container_name: webhook_pipeline_frontend
-    restart: always
+    restart: always           # restart automatically if they crash, makes env more resilient during testing
     ports:
       - "5173:5173"          # map host:container 5173
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/app       # used volume for frontend so that frontend changes reflect without rebuilding the image each time
+      - /app/node_modules     # mounted this so that it does not overwrite the installed dependencies inside the docker
     working_dir: /app
     depends_on:
       - api
@@ -51,6 +51,8 @@ volumes:
   postgres_data:                        #named volume docker manages for persistent storage
 
 
-#both api and worker should use env.docker because they run inside docker containers, not on my machine.
-#Inside Docker,containers communicate over the Docker network using service names as hostnames, so db_host should be postgres
-#because i defined it above. Basically Docker compose lets other containers reach that service by its name
+#improvement ideas:
+  #health checks
+  #more production-friendly commands
+  #improve secrets handling
+  #seperate developmenet and production configurations more clearly

@@ -44,6 +44,7 @@ interface Metrics {
   };
 }
 
+//UI component that displays metric label with values as a styled card
 function MetricCard({
   title,
   value,
@@ -61,10 +62,11 @@ function MetricCard({
   );
 }
 
+//helper function that formats date string into readable date/time
 function formatDate(value?: string | null) {
-  if (!value) return "—";
+  if (!value) return "—"; // if value is missing return -
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+  if (Number.isNaN(date.getTime())) return value; // if value invalid, it returns the original value
   return date.toLocaleString();
 }
 
@@ -76,8 +78,8 @@ function JsonBlock({ value }: { value: unknown }) {
   );
 }
 
-export default function App() {
-  const [pipelines, setPipelines] = useState<Pipeline[]>([]); // stores the list of pipelines from the API, create array of pipeline objects 
+export default function App() {    //useState is for storing and updating data in the UI
+  const [pipelines, setPipelines] = useState<Pipeline[]>([]); // useState gives the current pipelines value and a setter; setPipelines(newData) updates pipelines
   const [jobs, setJobs] = useState<Job[]>([]); // stores the recent jobs shown in the dashboard
   const [metrics, setMetrics] = useState<Metrics | null>(null); // stores system summary metrics like counts
   const [error, setError] = useState<string | null>(null); // stores a user-friendly error message if fetching fails
@@ -165,7 +167,8 @@ export default function App() {
     setSelectedJobId(jobId);
     fetchJobDetails(jobId);
   }
-
+  // runs side effects after component renders
+  //loads dashboard data on mount, and auto refresh every 5 sec
   useEffect(() => {
     // load main dashboard data when component mounts
     fetchData();

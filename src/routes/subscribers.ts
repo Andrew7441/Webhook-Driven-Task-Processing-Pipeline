@@ -20,7 +20,8 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
         `,
         [pipelineId]
     );
-
+    
+    //edge case
     if(pipelineResult.rowCount === 0){
         return res.status(404).send({ error: "No pipeline found"});
     }
