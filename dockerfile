@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 #port
 EXPOSE 8080
-#default command to run dev server inside container for local dev and testing
+#default command to run dev server inside container(api) for local dev and testing
 CMD ["npm", "run", "dev"]
 
 #improvement ideas:

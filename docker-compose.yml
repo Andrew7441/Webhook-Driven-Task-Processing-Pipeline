@@ -23,7 +23,7 @@ services: # split multiple services bcz each service has a clear responsibility.
     env_file:
       - .env.docker                     #load environment variables from .env.docker
 
-  worker:
+  worker: # worker reaches api using api:8080 by using docker compose internal network 
     build: .
     container_name: webhook_pipeline_worker
     restart: always
