@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./ 
 #install dependencies needed by container at runtime
 RUN npm install 
-#copies project files
+#copies project files, copy after installing dep. bcz it helps docker layer caching and avoids reinstalling dependencies everytime src files change
 COPY . .
 #port
 EXPOSE 8080

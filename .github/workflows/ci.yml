@@ -18,14 +18,14 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4 # install Node.js
         with:
-          node-version: 22
+          node-version: 22 # match the runtime that was being built against
           cache: npm # cache: npm speeds up dependency installation in CI
           cache-dependency-path: |
             package-lock.json
             frontend/package-lock.json # cache both root and frontend dependencies
 
       - name: Install root dependencies # installs root dependencies from package-lock.json
-        run: npm ci
+        run: npm ci # used ci instead of install because this makes ci more predictable and reproducible
 
       - name: Build backend/root project # compiles backend TypeScript
         run: npm run build
@@ -64,3 +64,6 @@ jobs:
 
       - name: Lint frontend
         run: npm run lint:frontend # runs frontend lint with frontend dependencies installed
+
+# improve ideas:
+  # add automated tests, seperate dev & production docker build checks, eventually deploy a hosted env 
