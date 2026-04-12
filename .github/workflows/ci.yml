@@ -1,4 +1,4 @@
-# workflow name shown in the Actions tab
+# CI: installs dependencies, builds back/front end , lints code 
 name: ci
 
 # run this workflow when code is pushed to the main branch

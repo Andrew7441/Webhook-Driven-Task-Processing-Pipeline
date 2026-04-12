@@ -29,8 +29,8 @@ services: # split multiple services bcz each service has a clear responsibility.
     restart: always
     env_file:
       - .env.docker                     # uses env.docker because db host must be postgres
-    command: ["npm", "run", "worker"]   #run worker. It needs its own command because it must run npm run worker instead of the API server
-    depends_on:
+    command: ["npm", "run", "worker"]   #run worker. overrides backend image bcz can serve 2 purposes. api runs the server but worker needs to
+    depends_on:                                      # run job loop
       - postgres
 
   frontend:

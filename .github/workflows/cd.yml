@@ -1,3 +1,4 @@
+# CD: builds the docker images & verifies dockerfiles / compose can build
 name: cd
 
 on:
