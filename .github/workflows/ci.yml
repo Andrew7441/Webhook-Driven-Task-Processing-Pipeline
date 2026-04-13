@@ -25,7 +25,7 @@ jobs:
             frontend/package-lock.json # cache both root and frontend dependencies
 
       - name: Install root dependencies # installs root dependencies from package-lock.json
-        run: npm ci # used ci instead of install because this makes ci more predictable and reproducible
+        run: npm ci # used ci instead of install because it installs whats exactly in the lock files, more deterministic  
 
       - name: Build backend/root project # compiles backend TypeScript
         run: npm run build
