@@ -176,6 +176,7 @@ Example:
 
 ### echo 
 Returns the payload unchanged
+
 Example:
 ```json
 {
@@ -193,9 +194,6 @@ Example:
 {
   "commit_count": 3
 }
-
-### count_payload_keys
-Counts how many top level keys exist in the webhook payload
 
 Example:
 ```json
