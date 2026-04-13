@@ -36,6 +36,25 @@ jobs:
       - name: Build frontend project # builds the frontend so CI verifies both backend and dashboard
         run: npm --prefix frontend run build
 
+  style:
+    name: Style
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with: 
+          node-version: 22
+
+      - name: install root dependencies
+        run: npm ci
+      
+      - name: Formatting Checks
+        run: npm run format:check
+
   lint: # checks code style and quality using linter.
     name: Lint
     runs-on: ubuntu-latest
