@@ -16,6 +16,7 @@ system metrics in real time.
     - echo
     - lowercase_repo
     - count_payload_keys
+    - count_commits
 - Register subscribers per pipeline
 - Deliver processed results to subscribers 
 - Retry failed deliveries with a simple backoff
@@ -182,6 +183,15 @@ Example:
   }
 }
 ```
+
+### count_commits
+Counts how many commit objects exist in the `commits` array of the webhook payload.
+
+Example:
+```json
+{
+  "commit_count": 3
+}
 
 ### count_payload_keys
 Counts how many top level keys exist in the webhook payload
