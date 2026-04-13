@@ -36,20 +36,24 @@ jobs:
       - name: Build frontend project # builds the frontend so CI verifies both backend and dashboard
         run: npm --prefix frontend run build
 
-  style:
-    name: Style
+  formatting:
+    name: Formatting
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Check out code
         uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with: 
           node-version: 22
+          cache: npm # caching for consistency/speed
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
 
-      - name: install root dependencies
+      - name: Install root dependencies
         run: npm ci
       
       - name: Formatting Checks
