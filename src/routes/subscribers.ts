@@ -13,6 +13,7 @@ SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
     // edge cases
     if(!pipelineId || !target_url) return res.status(400).send({error: "PipelineId and targetUrl are both required!"});
 
+    //edge case to check if pipeline exists
     const pipelineResult = await pool.query(
         `
         SELECT id FROM pipelines

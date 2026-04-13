@@ -1,3 +1,4 @@
+![CI](https://github.com/Andrew7441/Webhook-Driven-Task-Processing-Pipeline/actions/workflows/ci.yml/badge.svg)
 # Webhook-Driven Task Processing Pipeline
 
 A TypeScript backend service that receives webhooks, queues them as jobs, processes them in the background, and delivers the processed
