@@ -3,59 +3,62 @@ import { pool } from "../db/connection";
 
 export const SubscriberRouter = Router(); // create router instance dedicated to subscriber endpoints
 
-
-//POST /pipelines/:pipelineId/subscribers 
+//POST /pipelines/:pipelineId/subscribers
 //adds a subscriber URL to a pipeline
 SubscriberRouter.post("/:pipelineId/subscribers", async (req, res) => {
-    const pipelineId = Number(req.params.pipelineId); // Express extracts :pipelineId from the URL (route parameter)
-    const { target_url } = req.body ?? {};            // subscriber destination URL from request body
+  const pipelineId = Number(req.params.pipelineId); // Express extracts :pipelineId from the URL (route parameter)
+  const { target_url } = req.body ?? {}; // subscriber destination URL from request body
 
-    // edge cases
-    if(!pipelineId || !target_url) return res.status(400).send({error: "PipelineId and targetUrl are both required!"});
+  // edge cases
+  if (!pipelineId || !target_url)
+    return res
+      .status(400)
+      .send({ error: "PipelineId and targetUrl are both required!" });
 
-    //edge case to check if pipeline exists
-    const pipelineResult = await pool.query(
-        `
+  //edge case to check if pipeline exists
+  const pipelineResult = await pool.query(
+    `
         SELECT id FROM pipelines
         WHERE id = $1
         `,
-        [pipelineId]
-    );
-    
-    //edge case
-    if(pipelineResult.rowCount === 0){
-        return res.status(404).send({ error: "No pipeline found"});
-    }
+    [pipelineId],
+  );
 
-    // insert subscriber record so this pipeline can deliver results to this URL
-    const result = await pool.query(
-        `
+  //edge case
+  if (pipelineResult.rowCount === 0) {
+    return res.status(404).send({ error: "No pipeline found" });
+  }
+
+  // insert subscriber record so this pipeline can deliver results to this URL
+  const result = await pool.query(
+    `
         INSERT INTO pipeline_subscribers (pipeline_id, target_url)
         VALUES ($1, $2)
         RETURNING id, pipeline_id, target_url, created_at
         `,
-        [pipelineId, target_url]
-    );
+    [pipelineId, target_url],
+  );
 
-    return res.status(201).send(result.rows[0]); // return the created subscriber
+  return res.status(201).send(result.rows[0]); // return the created subscriber
 });
 
 // GET /pipelines/:pipelineId/subscribers route
 // returns all subscriber URLs registered for a pipeline
 SubscriberRouter.get("/:pipelineId/subscribers", async (req, res) => {
-    const pipelineId = Number(req.params.pipelineId);
+  const pipelineId = Number(req.params.pipelineId);
 
-    //edge case
-    if(!pipelineId) return res.status(400).send({error: "pipelineId is required"});
+  //edge case
+  if (!pipelineId)
+    return res.status(400).send({ error: "pipelineId is required" });
 
-    const result = await pool.query(
-        `
+  const result = await pool.query(
+    `
         SELECT * FROM pipeline_subscribers 
         WHERE pipeline_id = $1
         ORDER BY id ASC
         `,
-        [pipelineId]
-    );
+    [pipelineId],
+  );
 
-    return res.send(result.rows); // return list of subscriber endpoints
+  return res.send(result.rows); // return list of subscriber endpoints
 });
