@@ -90,3 +90,7 @@ jobs:
 
 # improve ideas:
   # add automated tests, seperate dev & production docker build checks, eventually deploy a hosted env 
+
+# CI and CD Docker build are similar but not the same because:
+# CI validates the code base through install, lint and build steps
+# CD validates the containerized runtime packaging

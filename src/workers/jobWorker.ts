@@ -250,6 +250,7 @@ async function workLoop() {
   while (true) {
     const job = await claimNextJob(); // claim Pending job
 
+    //edge case
     if (!job) {
       await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
       continue;
