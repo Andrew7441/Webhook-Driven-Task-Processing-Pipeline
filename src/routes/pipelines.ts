@@ -17,7 +17,7 @@ const ALLOWED_ACTION_TYPES = [
 PipeLineRouter.post("/", async (req, res) => {
   const { name, source_key, action_type } = req.body ?? {}; // extract pipeline fields from req body
 
-  //edge case
+  //edge case - validation
   if (!name || !source_key || !action_type)
     return res.status(400).send({
       // validate required fields exist
@@ -51,17 +51,15 @@ PipeLineRouter.post("/", async (req, res) => {
 });
 
 //API GET /pipelines which lists all pipelines
-PipeLineRouter.get("/", async (req, res) => {
-  //fetch pipelines from database, newest first
-  const result = await pool.query(
-    `
-        SELECT * FROM pipelines 
-        ORDER BY id DESC
-        `,
-  );
-
-  // return array of pipelines even if empty
-  return res.send(result.rows);
+PipeLineRouter.get("/", async (req, res, next) => {
+  try{
+    const result = await pool.query(`
+        SELECT * FROM pipelines ORDER BY id DESC
+      `);
+      res.send(result.rows);
+  }catch(err){
+    next(err); // sends it to error handler
+  }
 });
 
 //GET /pipelines/:pipelineId
