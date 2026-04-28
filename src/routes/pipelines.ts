@@ -52,12 +52,12 @@ PipeLineRouter.post("/", async (req, res) => {
 
 //API GET /pipelines which lists all pipelines
 PipeLineRouter.get("/", async (req, res, next) => {
-  try{
+  try {
     const result = await pool.query(`
         SELECT * FROM pipelines ORDER BY id DESC
       `);
-      res.send(result.rows);
-  }catch(err){
+    res.send(result.rows);
+  } catch (err) {
     next(err); // sends it to error handler
   }
 });

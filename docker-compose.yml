@@ -1,58 +1,58 @@
 services: # split multiple services bcz each service has a clear responsibility. makes the sys easier to build,debug,explain
-  postgres:                             #service name
-    image: postgres:16                  #official postgresql v16 image
+  postgres: #service name
+    image: postgres:16 #official postgresql v16 image
     container_name: webhook_pipeline_db #name of the running container
-    restart: always                     #automatically restart if container stops
-    environment:                        #env variables used by postgres
-      POSTGRES_USER: postgres           
+    restart: always #automatically restart if container stops
+    environment: #env variables used by postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pipeline_db
     ports:
-      - "5432:5432"                     #map container port -> host port
+      - "5432:5432" #map container port -> host port
     volumes:
-      - postgres_data:/var/lib/postgresql/data #persist database files 
+      - postgres_data:/var/lib/postgresql/data #persist database files
 
-  api:                                  #Node.js API service
-    build: .                            #build container from Dockerfile in project root
+  api: #Node.js API service
+    build: . #build container from Dockerfile in project root
     container_name: webhook_pipeline_api #name of the running API container
-    restart: always                     #restart API if it crashes
+    restart: always #restart API if it crashes
     depends_on:
-      - postgres                        #ensure postgres starts before API
+      - postgres #ensure postgres starts before API
     ports:
-      - "8080:8080"                     #expose API to localhost:8080
+      - "8080:8080" #expose API to localhost:8080
     env_file:
-      - .env.docker                     #load environment variables from .env.docker
+      - .env.docker #load environment variables from .env.docker
 
-  worker: # worker reaches api using api:8080 by using docker compose internal network 
+  worker: # worker reaches api using api:8080 by using docker compose internal network
     build: .
     container_name: webhook_pipeline_worker
     restart: always
     env_file:
-      - .env.docker                     # uses env.docker because db host must be postgres
-    command: ["npm", "run", "worker"]   #run worker. overrides backend image bcz can serve 2 purposes. api runs the server but worker needs to
-    depends_on:                                      # run job loop
+      - .env.docker # uses env.docker because db host must be postgres
+    command: ["npm", "run", "worker"] #run worker. overrides backend image bcz can serve 2 purposes. api runs the server but worker needs to
+    depends_on: # run job loop
       - postgres
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: dockerfile  # keep exact name if lowercase
+      dockerfile: dockerfile # keep exact name if lowercase
     container_name: webhook_pipeline_frontend
-    restart: always           # restart automatically if they crash, makes env more resilient during testing
+    restart: always # restart automatically if they crash, makes env more resilient during testing
     ports:
-      - "5173:5173"          # map host:container 5173
+      - "5173:5173" # map host:container 5173
     volumes:
-      - ./frontend:/app       # used volume for frontend so that frontend changes reflect without rebuilding the image each time
-      - /app/node_modules     # mounted this so that it does not overwrite the installed dependencies inside the docker
+      - ./frontend:/app # used volume for frontend so that frontend changes reflect without rebuilding the image each time
+      - /app/node_modules # mounted this so that it does not overwrite the installed dependencies inside the docker
     working_dir: /app
     depends_on:
       - api
 volumes:
-  postgres_data:                        #named volume docker manages for persistent storage
+  postgres_data: #named volume docker manages for persistent storage
 
 
 #improvement ideas:
-  #health checks
-  #more production-friendly commands
-  #improve secrets handling
-  #seperate developmenet and production configurations more clearly
+#health checks
+#more production-friendly commands
+#improve secrets handling
+#seperate developmenet and production configurations more clearly

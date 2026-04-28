@@ -78,14 +78,15 @@ function JsonBlock({ value }: { value: unknown }) {
   );
 }
 
-export default function App() {    //useState is for storing and updating data in the UI
+export default function App() {
+  //useState is for storing and updating data in the UI
   const [pipelines, setPipelines] = useState<Pipeline[]>([]); // useState gives the current pipelines value and a setter; setPipelines(newData) updates pipelines
   const [jobs, setJobs] = useState<Job[]>([]); // stores the recent jobs shown in the dashboard
   const [metrics, setMetrics] = useState<Metrics | null>(null); // stores system summary metrics like counts
   const [error, setError] = useState<string | null>(null); // stores a user-friendly error message if fetching fails
   const [isLoading, setIsLoading] = useState(true); // controls the initial loading screen while dashboard data is being fetched
 
-  const [selectedJobId, setSelectedJobId] = useState<number | null>(null); // stores which job the user clicked, then 
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null); // stores which job the user clicked, then
   const [selectedJob, setSelectedJob] = useState<JobDetails | null>(null); // stores the full details of that job, and shows it to user
   const [deliveries, setDeliveries] = useState<DeliveryAttempt[]>([]);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -93,7 +94,6 @@ export default function App() {    //useState is for storing and updating data i
 
   async function fetchData() {
     try {
-
       const [pRes, jRes, mRes] = await Promise.all([
         fetch("/api/pipelines"),
         fetch("/api/jobs"),
@@ -103,18 +103,18 @@ export default function App() {    //useState is for storing and updating data i
       //edge case
       if (!pRes.ok || !jRes.ok || !mRes.ok) {
         throw new Error(
-          `API error: pipelines=${pRes.status}, jobs=${jRes.status}, metrics=${mRes.status}`
+          `API error: pipelines=${pRes.status}, jobs=${jRes.status}, metrics=${mRes.status}`,
         );
       }
 
-      // parse all three successful API responses into typed JSON objects, do all 3 at the same time 
+      // parse all three successful API responses into typed JSON objects, do all 3 at the same time
       const [p, j, m] = await Promise.all([
         pRes.json() as Promise<Pipeline[]>,
         jRes.json() as Promise<Job[]>,
         mRes.json() as Promise<Metrics>,
       ]);
 
-      // pass in data 
+      // pass in data
       setPipelines(p);
       setJobs(j);
       setMetrics(m);
@@ -140,7 +140,7 @@ export default function App() {    //useState is for storing and updating data i
       //edge case
       if (!jobRes.ok || !deliveriesRes.ok) {
         throw new Error(
-          `Job details error: job=${jobRes.status}, deliveries=${deliveriesRes.status}`
+          `Job details error: job=${jobRes.status}, deliveries=${deliveriesRes.status}`,
         );
       }
 
@@ -219,7 +219,9 @@ export default function App() {    //useState is for storing and updating data i
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6">
       <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold">Webhook Pipeline Dashboard</h1>
+          <h1 className="text-3xl font-extrabold">
+            Webhook Pipeline Dashboard
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Monitor pipelines, jobs, and metrics in real time
           </p>
@@ -245,7 +247,9 @@ export default function App() {    //useState is for storing and updating data i
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Pipelines</h2>
         {pipelines.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No pipelines found.</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No pipelines found.
+          </p>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {pipelines.map((p) => (
@@ -300,8 +304,8 @@ export default function App() {    //useState is for storing and updating data i
                     j.status === "completed"
                       ? "bg-green-500/10 text-green-600 dark:text-green-400"
                       : j.status === "failed"
-                      ? "bg-red-500/10 text-red-600 dark:text-red-400"
-                      : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                        ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                        : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
                   }`}
                 >
                   {j.status}
@@ -332,11 +336,14 @@ export default function App() {    //useState is for storing and updating data i
 
         {selectedJobId === null ? (
           <p className="text-gray-500 dark:text-gray-400">
-            Click a job to view payload, result, error, processed time, and delivery attempts.
+            Click a job to view payload, result, error, processed time, and
+            delivery attempts.
           </p>
         ) : detailsLoading ? (
           <div className="p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl">
-            <p className="text-gray-600 dark:text-gray-300">Loading job details…</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Loading job details…
+            </p>
           </div>
         ) : detailsError ? (
           <div className="p-5 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900 rounded-2xl">
@@ -347,27 +354,43 @@ export default function App() {    //useState is for storing and updating data i
             <div className="p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Job ID</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Job ID
+                  </p>
                   <p className="font-semibold">#{selectedJob.id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Pipeline ID</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Pipeline ID
+                  </p>
                   <p className="font-semibold">{selectedJob.pipeline_id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Status
+                  </p>
                   <p className="font-semibold">{selectedJob.status}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Processed At</p>
-                  <p className="font-semibold">{formatDate(selectedJob.processed_at)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Processed At
+                  </p>
+                  <p className="font-semibold">
+                    {formatDate(selectedJob.processed_at)}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Created At</p>
-                  <p className="font-semibold">{formatDate(selectedJob.created_at)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Created At
+                  </p>
+                  <p className="font-semibold">
+                    {formatDate(selectedJob.created_at)}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Error</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Error
+                  </p>
                   <p className="font-semibold text-red-600 dark:text-red-400">
                     {selectedJob.error ?? "—"}
                   </p>
@@ -382,7 +405,9 @@ export default function App() {    //useState is for storing and updating data i
 
             <div className="p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl">
               <h3 className="text-lg font-semibold mb-2">Result</h3>
-              <JsonBlock value={selectedJob.result ?? { message: "No result available" }} />
+              <JsonBlock
+                value={selectedJob.result ?? { message: "No result available" }}
+              />
             </div>
 
             <div className="p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl">
@@ -401,23 +426,35 @@ export default function App() {    //useState is for storing and updating data i
                     >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">Subscriber URL: </span>
-                          <span className="break-all">{delivery.subscriber_url}</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Subscriber URL:{" "}
+                          </span>
+                          <span className="break-all">
+                            {delivery.subscriber_url}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">Attempt: </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Attempt:{" "}
+                          </span>
                           <span>{delivery.attempt}</span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">Status: </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Status:{" "}
+                          </span>
                           <span>{delivery.status ?? "—"}</span>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">Response Code: </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Response Code:{" "}
+                          </span>
                           <span>{delivery.response_code ?? "—"}</span>
                         </div>
                         <div className="md:col-span-2">
-                          <span className="text-gray-500 dark:text-gray-400">Created At: </span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Created At:{" "}
+                          </span>
                           <span>{formatDate(delivery.created_at)}</span>
                         </div>
                       </div>

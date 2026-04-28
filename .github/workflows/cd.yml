@@ -2,17 +2,17 @@
 name: cd
 
 on:
-    push:
-        branches: [main] # run CD when code is pushed to main
+  push:
+    branches: [main] # run CD when code is pushed to main
 
 jobs:
-    docker: 
-        name: Docker Build
-        runs-on: ubuntu-latest # runs job on a temporary Ubuntu GitHub runner
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest # runs job on a temporary Ubuntu GitHub runner
 
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4 # downloads repo code into runner (GitHub VM)
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4 # downloads repo code into runner (GitHub VM)
 
-            - name: Build Docker containers
-              run: docker compose build # verifies Dockerfile and docker-compose.yml build correctly
+      - name: Build Docker containers
+        run: docker compose build # verifies Dockerfile and docker-compose.yml build correctly
