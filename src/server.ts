@@ -9,7 +9,7 @@ import { pool } from "./db/connection";
 import { Response, Request, NextFunction } from "express";
 
 const PORT = 8080;
-const app = express(); // create http server
+const app = express(); // create http/express server/application
 
 //middleware - reads incoming json request bodies and makes them available as req.body, better than listening to events, end events, parsing, etc
 app.use(express.json()); // automatically checks if content type is set properly, parses the req.body, handles bad inputs
@@ -37,7 +37,7 @@ app.get("/server", async (req, res) => {
 app.use("/pipelines", PipeLineRouter); // PipeLineRouter - router that handles those requests
 //inside pipelineRouter are the actual handlers
 
-// mount webhook endpoints under /hooks
+// use mount webhook endpoints under /hooks route
 app.use("/hooks", hooksRouter);
 
 app.use("/pipelines", SubscriberRouter);
@@ -67,7 +67,7 @@ function errorHandler(
 
   return res.status(500).send({ error: "Internal Server Error" }); // generic error
 }
-
+//goes after routes so it can catch errors from the routes
 app.use(errorHandler);
 
 //starts the API server

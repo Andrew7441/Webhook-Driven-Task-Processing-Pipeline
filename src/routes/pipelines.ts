@@ -2,6 +2,7 @@ import { Router } from "express"; // defines route groups
 import { pool } from "../db/connection"; // connection pool
 
 export const PipeLineRouter = Router(); // create a router instance for pipeline endpoints
+//Cleaner structure, separation of concerns
 
 const ALLOWED_ACTION_TYPES = [
   "extract_commits",
