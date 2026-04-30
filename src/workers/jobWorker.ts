@@ -245,7 +245,7 @@ function sleep(ms: number) {
   // after ms , resolve runs and promise completes
 }
 
-// main loop
+// event loop - schedules async callbacks/tasks
 async function workLoop() {
   while (true) {
     const job = await claimNextJob(); // claim Pending job

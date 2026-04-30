@@ -40,19 +40,19 @@ PipeLineRouter.post("/", async (req, res) => {
       [name, source_key, action_type],
     );
 
-    return res.status(201).send(result.rows[0]);
+    return res.status(201).send(result.rows[0]); // 201 - new resource created
   } catch (err: any) {
     console.log(err);
     if (err?.code === "23505") {
       return res.status(409).send({ error: "source_key already exists" }); // postgres error code for unique constraint violation
     }
 
-    return res.status(500).send({ error: "internal server error" }); // generic server error
+    return res.status(500).send({ error: "internal server error" }); // generic/internal server error
   }
 });
 
 //API GET /pipelines which lists all pipelines
-PipeLineRouter.get("/", async (req, res, next) => {
+PipeLineRouter.get("/", async (req, res, next) => { // next passes control to the middleware/handler
   try {
     const result = await pool.query(`
         SELECT * FROM pipelines ORDER BY id DESC
