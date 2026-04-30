@@ -52,7 +52,8 @@ PipeLineRouter.post("/", async (req, res) => {
 });
 
 //API GET /pipelines which lists all pipelines
-PipeLineRouter.get("/", async (req, res, next) => { // next passes control to the middleware/handler
+PipeLineRouter.get("/", async (req, res, next) => {
+  // next passes control to the middleware/handler
   try {
     const result = await pool.query(`
         SELECT * FROM pipelines ORDER BY id DESC
